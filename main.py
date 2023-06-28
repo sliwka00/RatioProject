@@ -32,10 +32,42 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl import load_workbook
 
+#znajduje ostatnią uzupełnioną datę w pliku
+wb = load_workbook(filename="abc.xlsx")
+ws = wb["a"]
+ostatni_wiersz=ws.max_row
+ostatnia_data=ws.cell(row=ostatni_wiersz,column=1).value  #uchwycona ostatnia data, dla której są dane w pliku excel
+
+holidays = ["2023-04-10","2023-05-01","2023-05-03","2023-06-08","2023-08-15","2023-11-01","2023-11-11","2023-12-25","2023-12-26","2024-01-01"]
+
+# kod  na ostatni dzień roboczy
+dzisiaj=dt.date.today()
+delta1=dt.timedelta(days=1)
+delta2=dt.timedelta(days=2)
+ostatni_dzien=dzisiaj-delta1
+
+if ostatni_dzien.weekday() == 5:
+    ostatni_dzien = ostatni_dzien - delta1
+elif ostatni_dzien.weekday() == 6:
+    ostatni_dzien = ostatni_dzien - delta2
+
+ostatni_dzien_str=str(ostatni_dzien)
+
+for x in range(len(holidays)):
+    if ostatni_dzien_str in holidays:
+        ostatni_dzien = ostatni_dzien - delta1
+        if ostatni_dzien.weekday() == 5:
+            ostatni_dzien = ostatni_dzien - delta1
+        elif ostatni_dzien.weekday() == 6:
+            ostatni_dzien = ostatni_dzien - delta2
+        ostatni_dzien_str = str(ostatni_dzien)
+
+
 weekdays = [5,6]
-start_day = "2023-06-06"
-end_day = "2023-06-13"
-holidays = ["2023-04-10,2023-05-01, 2023-05-03,2023-06-08"]
+data_poczatkowa=dt.datetime.strptime(ostatnia_data,"%d-%m-%Y")+delta1     #trzeba do ostatniej daty dodać 1 dzień
+start_day = data_poczatkowa
+end_day = ostatni_dzien
+
 
 daterange = pd.date_range(start_day, end_day)
 for date in daterange:
@@ -74,4 +106,6 @@ for date in daterange:
 
         driver.close()
         driver.quit()
+
+
 

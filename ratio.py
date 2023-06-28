@@ -2,7 +2,8 @@ import PySimpleGUI as sg
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+import subprocess
+import sys
 lista=[]
 
 df = pd.read_excel(r'abc.xlsx')
@@ -28,16 +29,6 @@ for produkt in df['kontrakt short']:
 lista.sort()
 print(lista)
 
-def draw_ratio(produkt):
-    df_temp=df_wsp[df_wsp['kontrakt short']==produkt]
-    data=df_temp['Data']
-    ratio=df_temp['ratio']
-    plt.plot(data, ratio,marker='o', linestyle='-', color='blue')
-    plt.title(produkt)
-    plt.xlabel('Data')
-    plt.ylabel('ratio')
-    plt.show()
-
 def draw_ratio2(produkt):    # wyświetla ratio + 2 słupki wolumenowe base i peak
     df_temp=df_wsp[df_wsp['kontrakt short']==produkt]
     data=df_temp['Data']
@@ -62,18 +53,19 @@ def draw_ratio2(produkt):    # wyświetla ratio + 2 słupki wolumenowe base i pe
     fig.autofmt_xdate(rotation=35, ha='right')    #rotuje daty wyświetlane pod wykresem
     plt.show()
 
-
+#Layout Okna GUI
 sg.theme("Black") #gotowe motywy z kolorystyka do podejrzenia w internecie
 
 label=sg.Text("Wykres Ratio")
 
 all_label=sg.Text("Lista Produktów")
 all_combo=sg.Combo(lista, font=('Arial Bold', 14),  expand_x=True, enable_events=True, key='all_droplist')
-
+download_button=sg.Button(button_text="zaciągnij brakujące dane z TGE",key="download")
 
 window=sg.Window("Wykresy",
                  layout=[[label],
-                        [all_label,all_combo]])
+                        [all_label,all_combo],
+                        [download_button]])
 
 
 while True:
@@ -85,5 +77,8 @@ while True:
             break
         case 'all_droplist':
             draw_ratio2(values['all_droplist'])
-
+        case'download':
+            subprocess.Popen([sys.executable,"main.py"])   #uruchamia skrypt do ściągniecią danych ze strony po kliknięciu w przycisk
+            subprocess.Popen([sys.executable,"ratio.py"])     #uruchamiam GUI jeszcze raz,żeby zaciągniete nowe dane do excela były już dostępne
 window.close()
+
