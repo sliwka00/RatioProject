@@ -78,7 +78,10 @@ while True:
         case 'all_droplist':
             draw_ratio2(values['all_droplist'])
         case'download':
-            subprocess.Popen([sys.executable,"main.py"])   #uruchamia skrypt do ściągniecią danych ze strony po kliknięciu w przycisk
+            window.Hide()   #ukrywa pierwotne okno Gui(niezaktualizowane)
+            process=subprocess.Popen([sys.executable,"main.py"])   #uruchamia skrypt do ściągniecią danych ze strony po kliknięciu w przycisk
+            process.wait()  #czeka aż proces main.py sie dokończy żeby uruchomić ponownie ratop.py, ale nie działa (nie uruchamia się kolejnyy raz GUI
             subprocess.Popen([sys.executable,"ratio.py"])     #uruchamiam GUI jeszcze raz,żeby zaciągniete nowe dane do excela były już dostępne
 window.close()
 
+# pyinstaller --onedir --windowed --clean --add-data "abc.xlsx;." ratio.py main.py        próba kompilacji do exe
